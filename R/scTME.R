@@ -1,4 +1,4 @@
-function (obj, clusters, ref, level = 1, max.cells = 50000, return.details = F) {
+scTME <- function (obj, clusters, ref, level = 1, max.cells = 50000, return.details = F) {
     options(Seurat.object.assay.version = "v3")
     require(SingleR); library(SingleR)
     require(SingleCellExperiment); library(SingleCellExperiment)
