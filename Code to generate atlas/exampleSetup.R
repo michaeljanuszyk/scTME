@@ -43,10 +43,20 @@ curate_mtx <- function( geoName ) {
 }
 
 
-
 # Now run these functions to load specific GEO datasets
 curate_mtx('GSE267718')
 curate_h5( 'GSE284205')
+
+##Expected output (in terminal)
+# ls readyForSeurat/*
+# readyForSeurat/GSE267718:
+# readyForSeurat/GSE267718/GSM8273655.object.rds  readyForSeurat/GSE267718/GSM8273661.object.rds  readyForSeurat/GSE267718/GSM8273670.object.rds
+# readyForSeurat/GSE267718/GSM8273657.object.rds  readyForSeurat/GSE267718/GSM8273665.object.rds  readyForSeurat/GSE267718/GSM8273672.object.rds
+# readyForSeurat/GSE267718/GSM8273659.object.rds  readyForSeurat/GSE267718/GSM8273668.object.rds  readyForSeurat/GSE267718/GSM8273675.object.rds
+# readyForSeurat/GSE284205:
+# readyForSeurat/GSE284205/GSM8679728.object.rds  readyForSeurat/GSE284205/GSM8679731.object.rds  readyForSeurat/GSE284205/GSM8679734.object.rds
+# readyForSeurat/GSE284205/GSM8679729.object.rds  readyForSeurat/GSE284205/GSM8679732.object.rds
+# readyForSeurat/GSE284205/GSM8679730.object.rds  readyForSeurat/GSE284205/GSM8679733.object.rds
 
 
 # Next, run the code in tmeAnalysis_human.R on samples from these two datasets
