@@ -31,10 +31,15 @@ scTME <- function (obj, ref, clusters = NULL, level = 1, max.cells = 50000, retu
       pred <- SingleR(test = sce, ref = ref, labels = labels, de.method = "wilcox" )
     }
     newLabels = pred$labels
-    names(newLabels) <- levels(as.factor(clusters))
-    tempLabels = "tbd"
-    for (c in unique(clusters)) {
-        tempLabels[clusters == c] = newLabels[c]
+
+    if( !is.null(clusters) ) {
+      names(newLabels) <- levels(as.factor(clusters))
+      tempLabels = "tbd"
+      for (c in unique(clusters)) {
+          tempLabels[clusters == c] = newLabels[c]
+      }
+    } else {
+      tempLabels = newLabels
     }
     if (return.details) {
         returnList = list(tempLabels, pred)
