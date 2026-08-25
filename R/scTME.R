@@ -1,4 +1,4 @@
-scTME <- function (obj, clusters, ref, level = 1, max.cells = 50000, return.details = F) {
+scTME <- function (obj, ref, clusters = NULL, level = 1, max.cells = 50000, return.details = F) {
     options(Seurat.object.assay.version = "v3")
     require(SingleR); library(SingleR)
     require(SingleCellExperiment); library(SingleCellExperiment)
@@ -25,8 +25,11 @@ scTME <- function (obj, clusters, ref, level = 1, max.cells = 50000, return.deta
     else {
         labels = ref$integrated.annotation
     }
-    pred <- SingleR(test = sce, ref = ref, labels = labels, de.method = "wilcox", 
-        clusters = clusters)
+    if( clusters != NULL ) {
+      pred <- SingleR(test = sce, ref = ref, labels = labels, de.method = "wilcox", clusters = clusters)
+    } else {
+      pred <- SingleR(test = sce, ref = ref, labels = labels, de.method = "wilcox" )
+    }
     newLabels = pred$labels
     names(newLabels) <- levels(as.factor(clusters))
     tempLabels = "tbd"
