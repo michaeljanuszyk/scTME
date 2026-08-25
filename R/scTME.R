@@ -25,7 +25,7 @@ scTME <- function (obj, ref, clusters = NULL, level = 1, max.cells = 50000, retu
     else {
         labels = ref$integrated.annotation
     }
-    if( clusters != NULL ) {
+    if( !is.null(clusters) ) {
       pred <- SingleR(test = sce, ref = ref, labels = labels, de.method = "wilcox", clusters = clusters)
     } else {
       pred <- SingleR(test = sce, ref = ref, labels = labels, de.method = "wilcox" )
