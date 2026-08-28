@@ -1,0 +1,9 @@
+^doc$
+^Meta$
+^Code to analyze atlas$
+^Code to generate atlas$
+^datasets_human\.csv$
+^datasets_mouse\.csv$
+^vignette_instructions$
+^scTME\.Rproj$
+^LICENSE\.md$
