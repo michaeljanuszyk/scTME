@@ -1,0 +1,245 @@
+---
+title: "scTME: Automated Tumor Microenvironment Annotation"
+author: "Michael Januszyk"
+date: "2026-08-17"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{scTME: Automated Tumor Microenvironment Annotation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r install-packages, eval = FALSE, include = FALSE}
+## Install Required Packages
+
+# 1. Check for and install BiocManager from CRAN
+if (!require("BiocManager", quietly = TRUE)) {
+    install.packages("BiocManager")
+}
+
+# 2. Check for and install SingleR from Bioconductor
+if (!require("SingleR", quietly = TRUE)) {
+    BiocManager::install("SingleR")
+}
+
+# 3. Check for and install scrapper from Bioconductor
+if (!require("scrapper", quietly = TRUE)) {
+    BiocManager::install("scrapper")
+}
+
+# 4. Check for and install devtools from CRAN
+if (!require("devtools", quietly = TRUE)) {
+    install.packages("devtools")
+}
+
+# 5. Check for and install SingleCellExperiment from Bioconductor
+if (!require("SingleCellExperiment", quietly = TRUE)) {
+    BiocManager::install("SingleCellExperiment")
+}
+
+# 6. Check for and install scTME from GitHub
+if (!require("scTME", quietly = TRUE)) {
+    devtools::install_github("michaeljanuszyk/scTME")
+}
+```
+
+
+```{r setup, message = FALSE, warning = FALSE}
+## Load Packages
+library(Seurat)
+library(SingleR)
+library(scrapper)
+library(SingleCellExperiment)
+library(scTME)
+```
+
+```{r, echo=FALSE}
+xaringanExtra::use_clipboard(
+  button_text = "&#128203; Copy",
+  success_text = "&#10004; Copied!"
+)
+```
+
+Then download a heavily down-sampled (1,000 total cells) from the Nieto
+2021 immune cell atlas (A single-cell tumor immune atlas for precision
+oncology), made available at <https://tmeatlas.stanford.edu> -->
+Analyze Data --> Download --> nieto_2021_downsampled1k.rds There is
+also a 10k cells object available here, which was used for the
+accompanying manuscript, but we'll use the smaller one now to reduce
+processing time.
+
+```{r}
+data("scTME_atlas", package = "scTME")
+```
+
+```{r}
+query_path <- system.file("extdata", "nieto_2021_downsampled1k.rds", package = "scTME")
+query_dataset <- readRDS(query_path)
+```
+
+Note that this is a Seurat object. SingleCellExperiment objects can also be passed to scTME.
+
+```{r}
+names(query_dataset@meta.data)
+```
+
+We can see that the Nieto dataset has two levels of annotations
+(lv1_annot and lv2_annot), which are the final assignments made in that
+group's study. We have also added a "cluster" parameter which represents
+the sorted order of the lv2_annot values. This allows us to blindly
+evaluate cells for this short vignette.
+
+```{r}
+table(query_dataset$lv1_annot)
+```
+
+
+```{r}
+table(query_dataset$lv2_annot)
+```
+
+
+```{r}
+table(query_dataset$cluster)
+```
+
+## Run scTME on the query dataset
+
+Now we can go ahead and run `scTME`. This function accepts up to 8 parameters:
+
+* **`obj`**: The Seurat or SingleCellExperiment query dataset on which to run the predictions.
+* **`ref`**: (Default: `NULL`) The reference object powering scTME (`scTME_atlas`). If left as `NULL`, the package's built-in reference atlas will load automatically.
+* **`clusters`**: (Default: `NULL`) If `NULL`, the function evaluates each cell independently. Alternatively, provide a character array or column name labeling the groups/clusters in the query dataset (e.g., `query_dataset$cluster` or `"cluster"`) to run faster, cluster-level predictions.
+* **`level`**: (Default: `2`) Evaluates the query against all 50 high-resolution subpopulations. It can optionally be set to `1` to evaluate against the 8 broader parent populations.
+* **`label.col`**: (Default: `NULL`) The specific metadata column in the reference object containing the cell type labels. If `NULL`, the function automatically selects the correct column based on your chosen `level`.
+* **`max.cells`**: (Default: `50000`) To improve runtime, this value automatically downsamples the *query dataset* if it exceeds this threshold.
+* **`fast`**: (Default: `FALSE`) If set to `TRUE`, this automatically downsamples the internal *scTME reference atlas* from 50,000 cells to 5,000 cells to significantly speed up computation time. 
+* **`return.details`**: (Default: `FALSE`) By default, `scTME` returns a vector of the most likely cell type predictions. If set to `TRUE`, the program returns a full list object containing additional prediction strength and confidence metrics.
+
+
+```{r}
+res = scTME( obj = query_dataset, ref = NULL, clusters = query_dataset$cluster, level=1, return.details = F )
+```
+
+```{r}
+query_dataset$prediction <- unname(res)
+```
+
+## Compare annotations
+
+We can now, for example, compare these predictions from this atlas against those originally assigned by Nieto. (Using the 10k cells object results in higher fidelity than the 1k object)
+
+```{r, fig.width=10, fig.height=8}
+library(pheatmap)
+
+# 1. Create the base matrix
+conf_table <- table(query_dataset$prediction, query_dataset$lv1_annot)
+conf_matrix <- as.matrix(conf_table)
+
+# 2. Row Normalization (convert to proportions from 0.0 to 1.0)
+norm_matrix <- conf_matrix / rowSums(conf_matrix)
+
+# 3. Create a custom palette (Pure white for 0, then noticeable pink to dark red)
+my_colors <- c("white", colorRampPalette(c("lightpink", "firebrick3"))(49))
+
+# 4. Generate the heatmap
+pheatmap(
+  mat = norm_matrix, 
+  display_numbers = conf_matrix, # Colors by proportion, but prints the RAW cell counts!
+  cluster_rows = FALSE,
+  cluster_cols = FALSE,
+  color = my_colors,
+  main = "scTME Predictions vs. True Annotations"
+)
+```
+
+
+## Compare annotations
+
+We can also use the level 2 annotations to get more precise predictions for each query_dataset$cluster
+
+```{r}
+res = scTME( query_dataset, ref=NULL, clusters = query_dataset$cluster, level=2, return.details = F )
+
+query_dataset$prediction = unname(res)
+```
+
+
+```{r, fig.width=10, fig.height=8}
+library(pheatmap)
+
+# 1. Create the base matrix
+conf_table <- table(query_dataset$prediction, query_dataset$lv2_annot)
+conf_matrix <- as.matrix(conf_table)
+
+# 2. Row Normalization (convert to proportions from 0.0 to 1.0)
+norm_matrix <- conf_matrix / rowSums(conf_matrix)
+
+# 3. Create a custom palette (Pure white for 0, then noticeable pink to dark red)
+my_colors <- c("white", colorRampPalette(c("lightpink", "firebrick3"))(49))
+
+# 4. Generate the heatmap
+pheatmap(
+  mat = norm_matrix, 
+  display_numbers = conf_matrix, # Colors by proportion, but prints the RAW cell counts!
+  cluster_rows = FALSE,
+  cluster_cols = FALSE,
+  color = my_colors,
+  main = "scTME Predictions vs. True Annotations"
+)
+```
+
+
+```{r}
+res = scTME( query_dataset, ref=NULL, clusters = NULL, level=2, return.details = F )
+query_dataset$prediction = unname(res)
+```
+
+
+```{r, fig.width=10, fig.height=8}
+library(pheatmap)
+
+# 1. Create the base matrix
+conf_table <- table(query_dataset$prediction, query_dataset$lv2_annot)
+conf_matrix <- as.matrix(conf_table)
+
+# 2. Row Normalization (convert to proportions from 0.0 to 1.0)
+norm_matrix <- conf_matrix / rowSums(conf_matrix)
+
+# 3. Create a custom palette (Pure white for 0, then noticeable pink to dark red)
+my_colors <- c("white", colorRampPalette(c("lightpink", "firebrick3"))(49))
+
+# 4. Generate the heatmap
+pheatmap(
+  mat = norm_matrix, 
+  display_numbers = conf_matrix, # Colors by proportion, but prints the RAW cell counts!
+  cluster_rows = FALSE,
+  cluster_cols = FALSE,
+  color = my_colors,
+  main = "scTME Predictions vs. True Annotations"
+)
+```
+
+
+## Visualize Predictions on UMAP
+
+#To see how the predicted cell types map onto the transcriptomic landscape, we can visualize the cells in reduced dimensional space. Here, we project both the original high-resolution annotations and the new `scTME` predictions onto the UMAP embeddings using Seurat's `DimPlot` function.
+
+
+```{r plot-umap, fig.width=12, fig.height=5, warning=FALSE, message=FALSE}
+library(patchwork)
+
+# Plot the original annotations
+plot_true <- DimPlot(query_dataset, reduction = "umap", group.by = "lv2_annot", label = TRUE, repel = TRUE) + 
+  ggtitle("True Annotations") +
+  NoLegend()
+
+# Plot the scTME predictions
+plot_pred <- DimPlot(query_dataset, reduction = "umap", group.by = "prediction", label = TRUE, repel = TRUE) + 
+  ggtitle("scTME Predictions") +
+  NoLegend()
+
+# Display side-by-side using patchwork
+plot_true + plot_pred
+```
+

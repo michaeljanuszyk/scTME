@@ -1,11 +1,26 @@
 Package: scTME
-Title: What the Package Does (One Line, Title Case)
-Version: 1.2.1
+Title: Single-Cell Tumor Microenvironment Atlas Pipeline
+Version: 1.0.0
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: use_mit_license()
+    person("Michael", "Januszyk", , "januszyk@stanford.edu", role = c("aut", "cre"))
+Description: Computational pipeline for predicting and evaluating cell populations across multi-organ tumor microenvironment single-cell transcriptomic datasets.
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+Imports: 
+    ggplot2,
+    pheatmap,
+    Seurat,
+    SingleCellExperiment,
+    SingleR
+Suggests: 
+    knitr,
+    rmarkdown,
+    scrapper,
+    xaringanExtra
+Config/roxygen2/version: 8.0.0
+Depends: 
+    R (>= 3.5)
+LazyData: true
+VignetteBuilder: knitr
+LazyDataCompression: xz
