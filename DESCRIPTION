@@ -11,10 +11,12 @@ Imports:
     ggplot2,
     pheatmap,
     Seurat,
+    SeuratObject,
     SingleCellExperiment,
     SingleR
 Suggests: 
     knitr,
+    patchwork,
     rmarkdown,
     scrapper,
     xaringanExtra
