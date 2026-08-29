@@ -52,24 +52,22 @@ scTME_generateHeatmap <- function(dataset,
 #' @param reduction A character string specifying the dimensional reduction to use. Default is "umap".
 #' @param pred_col A character string specifying the metadata column containing predictions.
 #' @export
-plotPredictionUmap <- function(seurat_obj, 
-                               reduction = "umap", 
+plotPredictionUmap <- function(seurat_obj,
+                               reduction = "umap",
                                pred_col = "prediction") {
-  
-  # 1. Verify the reduction exists in the object
-  if (!reduction %in% names(seurat_obj@reductions)) {
-    stop(paste("The reduction", reduction, "was not found in the Seurat object."))
+ 
+  # 1. Verify the reduction exists using Seurat's official accessor
+  if (!reduction %in% SeuratObject::Reductions(seurat_obj)) {
+    message(paste("Notice: The reduction", reduction, "was not found. Skipping plot."))
+    return(invisible(NULL))
   }
-  
-  # 2. Seurat's native DimPlot is usually the easiest way to handle this
-  # It automatically fetches the requested reduction and groups by your prediction column
-  plot <- Seurat::DimPlot(seurat_obj, 
-                          reduction = reduction, 
-                          group.by = pred_col, 
+ 
+  # 2. Generate the plot
+  plot <- Seurat::DimPlot(seurat_obj,
+                          reduction = reduction,
+                          group.by = pred_col,
                           label = TRUE) +
           ggplot2::ggtitle("scTME Automated Predictions")
-          
+
   return(plot)
 }
-
-
