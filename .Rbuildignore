@@ -7,3 +7,10 @@
 ^vignette_instructions$
 ^scTME\.Rproj$
 ^LICENSE\.md$
+^\.github$
+^\.gitignore$
+^\.Rhistory$
+^\.RData$
+^\.DS_Store$
+^code$
+^resources$
