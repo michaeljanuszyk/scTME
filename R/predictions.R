@@ -53,7 +53,10 @@ scTME <- function (obj, ref = NULL, clusters = NULL, level = 2, label.col = NULL
 
     # 2. Defensive Prep: Normalize the Reference (ref)
     if (inherits(ref, "Seurat")) {
-        if (needs_norm(ref)) {
+        # Check if the 'data' layer exists in the RNA assay
+        has_norm <- "data" %in% SeuratObject::Layers(ref[["RNA"]])
+    
+        if (!has_norm) {
             message("Log-normalizing reference object...")
             ref <- Seurat::NormalizeData(ref, verbose = FALSE)
         }
@@ -147,12 +150,12 @@ scTME <- function (obj, ref = NULL, clusters = NULL, level = 2, label.col = NULL
     ref_sce <- ref_sce[common, ]
     
     if( !is.null(cluster_vec) ) {
-      pred <- SingleR(test = sce, ref = ref_sce, labels = labels, de.method = "wilcox", clusters = cluster_vec)
+      pred <- SingleR::SingleR(test = sce, ref = ref_sce, labels = labels, de.method = "wilcox", clusters = cluster_vec, assay.type.test = "logcounts", assay.type.ref = "logcounts")
       newLabels <- pred$labels
       names(newLabels) <- rownames(pred)
       tempLabels <- newLabels[as.character(cluster_vec)]
     } else {
-      pred <- SingleR(test = sce, ref = ref_sce, labels = labels, de.method = "wilcox" )
+      pred <- SingleR(test = sce, ref = ref_sce, labels = labels, de.method = "wilcox" , assay.type.test = "logcounts", assay.type.ref = "logcounts")
       tempLabels <- pred$labels
     }
     

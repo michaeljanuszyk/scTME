@@ -231,12 +231,12 @@ library(patchwork)
 
 # Plot the original annotations
 plot_true <- DimPlot(query_dataset, reduction = "umap", group.by = "lv2_annot", label = TRUE, repel = TRUE) + 
-  ggtitle("True Annotations") +
+  ggplot2::ggtitle("True Annotations") +
   NoLegend()
 
 # Plot the scTME predictions
 plot_pred <- DimPlot(query_dataset, reduction = "umap", group.by = "prediction", label = TRUE, repel = TRUE) + 
-  ggtitle("scTME Predictions") +
+  ggplot2::ggtitle("scTME Predictions") +
   NoLegend()
 
 # Display side-by-side using patchwork
