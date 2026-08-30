@@ -42,7 +42,17 @@ The pipeline relies on the following R and Python package versions:
 
 We recommend using a large size server to run this code. It took us roughly 6 weeks to run our code using all datasets (studyList.txt) on Dual AMD EPYC 7713 processors (2.0 GHz, 64-cores/128-threads) with 2TB of NVMe SSD memory. We believe on average the runtime scales in an $O(n \log n)$ fashion, meaning that using only 50% of the samples would require considerably less than 50% of the runtime.
 
-Instructions for running this code on a very small number of samples can by found in code/Code to generate atlas/exampleSetup.R, including expected output. Running the code in tmeMetaAnalysis_human.R on these samples takes approximately four hours.
+Instructions for running this code on a very small number of samples can by found in code/code_to_generate-atlas/exampleSetup.R, including expected output. Running the code in tmeMetaAnalysis_human.R on these samples takes approximately four hours.
+
+---
+
+## 📦 Installation
+
+You can install the development version of `scTME` directly from GitHub using `devtools`:
+
+```r
+# install.packages("devtools")
+devtools::install_github("michaeljanuszyk/scTME")
 
 ---
 
