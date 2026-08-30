@@ -224,22 +224,29 @@ pheatmap(
 ## Visualize Predictions on UMAP
 
 #To see how the predicted cell types map onto the transcriptomic landscape, we can visualize the cells in reduced dimensional space. Here, we project both the original high-resolution annotations and the new `scTME` predictions onto the UMAP embeddings using Seurat's `DimPlot` function.
+## Visualize Predictions on UMAP
 
+To see how the predicted cell types map onto the transcriptomic landscape, we can visualize the cells in reduced dimensional space. Here, we project both the original high-resolution annotations and the new `scTME` predictions onto the UMAP embeddings using our custom plotting wrapper.
 
 ```{r plot-umap, fig.width=12, fig.height=5, warning=FALSE, message=FALSE}
 library(patchwork)
 
-# Plot the original annotations
-plot_true <- DimPlot(query_dataset, reduction = "umap", group.by = "lv2_annot", label = TRUE, repel = TRUE) + 
-  ggplot2::ggtitle("True Annotations") +
-  NoLegend()
+# Plot the original annotations using the safe wrapper
+plot_true <- plotPredictionUmap(query_dataset, reduction = "umap", pred_col = "lv2_annot")
 
-# Plot the scTME predictions
-plot_pred <- DimPlot(query_dataset, reduction = "umap", group.by = "prediction", label = TRUE, repel = TRUE) + 
-  ggplot2::ggtitle("scTME Predictions") +
-  NoLegend()
+# Plot the scTME predictions using the safe wrapper
+plot_pred <- plotPredictionUmap(query_dataset, reduction = "umap", pred_col = "prediction")
 
-# Display side-by-side using patchwork
-plot_true + plot_pred
-```
-
+# Only attempt to modify and combine the plots if the UMAP actually exists
+if (!is.null(plot_true) && !is.null(plot_pred)) {
+  
+  # Override the default titles and remove legends for clean patchwork display
+  plot_true <- plot_true + ggplot2::ggtitle("True Annotations") + Seurat::NoLegend()
+  plot_pred <- plot_pred + ggplot2::ggtitle("scTME Predictions") + Seurat::NoLegend()
+  
+  # Display side-by-side
+  plot_true + plot_pred
+  
+} else {
+  message("Skipping UMAP visualization because the 'umap' reduction is missing from the object.")
+}

@@ -5,4 +5,5 @@
 inst/doc
 /doc/
 /Meta/
-data/
+.DS_Store
+.*.swp
