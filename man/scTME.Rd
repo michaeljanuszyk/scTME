@@ -11,7 +11,6 @@ scTME(
   level = 2,
   label.col = NULL,
   max.cells = 50000,
-  fast = FALSE,
   return.details = FALSE
 )
 }
@@ -27,8 +26,6 @@ scTME(
 \item{label.col}{Target metadata column}
 
 \item{max.cells}{Downsampling threshold}
-
-\item{fast}{Downsample the reference atlas}
 
 \item{return.details}{Return prediction strength metrics}
 }

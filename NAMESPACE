@@ -3,10 +3,12 @@
 export(plotPredictionUmap)
 export(scTME)
 export(scTME_generateHeatmap)
-importFrom(Seurat,GetAssayData)
-importFrom(Seurat,Idents)
-importFrom(Seurat,NormalizeData)
-importFrom(Seurat,as.SingleCellExperiment)
+importFrom(Seurat,
+  GetAssayData,
+  Idents,
+  NormalizeData,
+  as.SingleCellExperiment
+)
 importFrom(SingleR,SingleR)
 importFrom(grDevices,colorRampPalette)
 importFrom(pheatmap,pheatmap)

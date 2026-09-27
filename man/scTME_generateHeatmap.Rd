@@ -12,7 +12,7 @@ scTME_generateHeatmap(
 )
 }
 \arguments{
-\item{dataset}{A data frame containing the prediction and annotation metadata.}
+\item{dataset}{A Seurat object or data frame containing the prediction and annotation metadata.}
 
 \item{pred_col}{A character string specifying the column name for predictions. Default is "prediction".}
 

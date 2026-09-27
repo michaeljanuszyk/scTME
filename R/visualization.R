@@ -5,7 +5,7 @@
 #' Color intensity represents the proportion of predictions, while the 
 #' printed numbers display the raw cell counts.
 #'
-#' @param dataset A data frame containing the prediction and annotation metadata.
+#' @param dataset A Seurat object or data frame containing the prediction and annotation metadata.
 #' @param pred_col A character string specifying the column name for predictions. Default is "prediction".
 #' @param annot_col A character string specifying the column name for true annotations. Default is "lv1_annot".
 #' @param title A character string for the main title of the heatmap.
@@ -19,8 +19,16 @@ scTME_generateHeatmap <- function(dataset,
                                   annot_col = "lv1_annot",
                                   title = "scTME Predictions vs. True Annotations") {
   
-  # 1. Create the base matrix dynamically from the specified columns
-  conf_table <- table(dataset[[pred_col]], dataset[[annot_col]])
+  # 1. Pull both columns as plain vectors, then cross-tabulate.
+  #    Seurat's `[[` returns a one-column data.frame rather than a vector,
+  #    and table() cannot handle a data.frame ("cannot xtfrm data frames").
+  .getcol <- function(x, col) {
+    v <- if (inherits(x, "Seurat")) x@meta.data[[col]] else x[[col]]
+    if (is.null(v)) stop("Column '", col, "' not found in the supplied object.")
+    if (is.data.frame(v)) v <- v[[1]]
+    v
+  }
+  conf_table <- table(.getcol(dataset, pred_col), .getcol(dataset, annot_col))
   conf_matrix <- as.matrix(conf_table)
   
   # 2. Row Normalization (convert to proportions from 0.0 to 1.0)

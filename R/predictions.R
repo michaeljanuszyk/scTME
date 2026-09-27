@@ -9,9 +9,8 @@
 #' @param level Resolution level (1 or 2)
 #' @param label.col Target metadata column
 #' @param max.cells Downsampling threshold
-#' @param fast Downsample the reference atlas
 #' @param return.details Return prediction strength metrics
-scTME <- function (obj, ref = NULL, clusters = NULL, level = 2, label.col = NULL, max.cells = 50000, fast = FALSE, return.details = FALSE) {
+scTME <- function (obj, ref = NULL, clusters = NULL, level = 2, label.col = NULL, max.cells = 50000, return.details = FALSE) {
 
     # 0. Track if we are using the default atlas
     using_default_ref <- is.null(ref)
@@ -67,13 +66,6 @@ scTME <- function (obj, ref = NULL, clusters = NULL, level = 2, label.col = NULL
     if (ncol(obj) > max.cells) {
         keep <- sample(colnames(obj), max.cells)
         obj <- obj[, keep]
-    }
-    
-    # 3.5 Downsample the reference for fast mode
-    if (fast && ncol(ref) > 5000) {
-        message("Fast mode enabled: downsampling reference to 5,000 cells...")
-        keep_ref <- sample(colnames(ref), 5000)
-        ref <- ref[, keep_ref]
     }
 
     # 4. Convert query to SingleCellExperiment
