@@ -1,6 +1,6 @@
 Package: scTME
 Title: Single-Cell Tumor Microenvironment Atlas Pipeline
-Version: 1.0.0
+Version: 1.1.0
 Authors@R: 
     person("Michael", "Januszyk", , "januszyk@stanford.edu", role = c("aut", "cre"))
 Description: Computational pipeline for predicting and evaluating cell populations across multi-organ tumor microenvironment single-cell transcriptomic datasets.
