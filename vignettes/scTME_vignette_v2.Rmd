@@ -83,7 +83,7 @@ query_dataset <- readRDS(query_path)
 
 A larger 10,000-cell version of the same dataset — the one used in the
 accompanying manuscript — can be downloaded from
-<https://tmeatlas.stanford.edu> under Analyze Data → Download. It gives higher
+the Download page of <https://tmeatlas.stanford.edu>. It gives higher
 fidelity than the 1,000-cell subset used here, at the cost of runtime.
 
 Note that this is a Seurat object. SingleCellExperiment objects can also be
